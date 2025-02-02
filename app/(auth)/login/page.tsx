@@ -6,6 +6,9 @@ import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import db from "@/lib/axiosInstance";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Email tidak valid" }),
@@ -22,8 +25,10 @@ export default function LoginPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [error, setError] = useState<any>({});
   const [type, setType] = useState<string>("password");
+  const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = formSchema.safeParse({
       email,
@@ -39,8 +44,29 @@ export default function LoginPage() {
       });
       setError(errors);
       console.log(error);
-    } else {
+    }
+    try {
+      setLoading(true);
       setError({});
+      const response = await db.post("api/auth/login", {
+        email,
+        password,
+      });
+      toast.success(response.data.message, {
+        duration: 3000,
+      });
+
+      localStorage.setItem("token", response.data.token);
+
+      console.log(response);
+
+      router.push("/");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const { data } = error.response;
+      toast.error(data.message || "Terjadi kesalahan pada server.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,7 +134,9 @@ export default function LoginPage() {
             />
             <Label htmlFor="remember">Show Password</Label>
           </div>
-          <Button type="submit">Login</Button>
+          <Button type="submit" disabled={loading}>
+            Login
+          </Button>
           <div className="text-center dark:text-slate-200 flex justify-center">
             <p>Dont have an account?</p>
             <Link href="/register" className="text-blue-600">

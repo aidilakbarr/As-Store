@@ -1,24 +1,15 @@
 import axios from "axios";
 
-const db = axios.create({
-  baseURL: process.env.BASE_URL,
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const db = axios.create();
 
-// Jika sudah jwt gunakan ini
-// db.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem("token");
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
+db.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 db.interceptors.response.use(
   (response) => response,

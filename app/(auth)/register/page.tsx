@@ -1,11 +1,13 @@
 "use client";
 
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 import db from "@/lib/axiosInstance";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const formSchema = z
   .object({
@@ -33,6 +35,7 @@ export default function LoginPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [error, setError] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,19 +60,27 @@ export default function LoginPage() {
       setError(errors);
     }
 
-    try {
-      setLoading(true);
-      setError({});
-      const response = await db.post("api/auth/register", {
-        username,
-        email,
-        password,
-      });
+    if (result.success) {
+      try {
+        setLoading(true);
+        setError({});
+        const response = await db.post("api/auth/register", {
+          username,
+          email,
+          password,
+        });
 
-      console.log(response);
-    } catch (error) {
-    } finally {
-      setLoading(false);
+        toast.success(response.data.message, {
+          duration: 3000,
+        });
+        router.push("/");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        const { data } = error.response;
+        toast.error(data.message || "Terjadi kesalahan pada server.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -165,7 +176,7 @@ export default function LoginPage() {
           </Button>
           <div className="text-center dark:text-slate-200 flex justify-center">
             <p>have an account?</p>
-            <Link href="/register" className="text-blue-600">
+            <Link href="/login" className="text-blue-600">
               {"  "}
               Login now
             </Link>
