@@ -1,7 +1,11 @@
-import jwt from "jsonwebtoken";
-const secretKey = process.env.SECRET_KEY;
+import * as jwt from "jose";
 
-interface User {
+const secretKey = new TextEncoder().encode(process.env.SECRET_KEY);
+const secretRefreshKey = new TextEncoder().encode(
+  process.env.SECRET_REFRESH_TOKEN_KEY
+);
+
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -11,26 +15,59 @@ if (!secretKey) {
   throw new Error("Secret key tidak di temukan");
 }
 
-const createAccessToken = (user: User) => {
+if (!secretRefreshKey) {
+  throw new Error("Secret key tidak di temukan");
+}
+
+const createAccessToken = async (user: User) => {
   const payload = {
     id: user.id,
     username: user.name,
     email: user.email,
   };
-  const option = {
-    expiresIn: 60,
-  };
-  return jwt.sign(payload, secretKey, option);
+  return await new jwt.SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("30m")
+    .sign(secretKey);
 };
 
-const verifyAccessToken = (token: string) => {
+const createRefreshToken = async (user: User) => {
+  const payload = {
+    id: user.id,
+    username: user.name,
+    email: user.email,
+  };
+
+  return await new jwt.SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("7d")
+    .sign(secretRefreshKey);
+};
+
+const verifyAccessToken = async (token: string) => {
   try {
-    const decoded = jwt.verify(token, secretKey);
-    return decoded;
+    const { payload } = await jwt.jwtVerify(token, secretKey);
+
+    return payload;
   } catch (error) {
-    console.error("token tidak valid", error);
+    console.error("[VERIFY_ACCESS_TOKEN: ]", error.message);
     return null;
   }
 };
 
-export { createAccessToken, verifyAccessToken };
+const verifyRefreshToken = async (token: string) => {
+  try {
+    const { payload } = await jwt.jwtVerify(token, secretRefreshKey);
+    return payload;
+  } catch (error) {
+    console.error("[VERIFY_REFRESH_TOKEN: ]", error.message);
+    return null;
+  }
+};
+
+export {
+  createAccessToken,
+  createRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+};

@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
-import { createAccessToken } from "@/lib/jwt";
+import { createAccessToken, createRefreshToken } from "@/lib/jwt";
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
+  const cookieStore = await cookies();
   const loginSchema = z.object({
     email: z.string().email({ message: "Email tidak valid" }),
     password: z.string().min(8, { message: "Password minimal 8 karakter" }),
@@ -49,12 +51,24 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    const token = createAccessToken(user);
+    const accessToken = await createAccessToken(user);
+    const refreshToken = await createRefreshToken(user);
 
-    return NextResponse.json(
-      { message: "Login Berhasil", token },
-      { status: 200 }
-    );
+    cookieStore.set("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 30,
+    });
+
+    cookieStore.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return NextResponse.json({ message: "Login Berhasil" }, { status: 200 });
   } catch (error) {
     console.log("[POST LOGIN: ]", error);
     return NextResponse.json({ error: error }, { status: 500 });

@@ -56,10 +56,6 @@ export default function LoginPage() {
         duration: 3000,
       });
 
-      localStorage.setItem("token", response.data.token);
-
-      console.log(response);
-
       router.push("/");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

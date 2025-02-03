@@ -1,24 +1,25 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import db from "@/lib/axiosInstance";
+import { useRouter } from "next/router";
 
 const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const verifyToken = async () => {
-      try {
-        const res = await db.post("/api/auth/me"); // Pakai axios instance
-        setIsAuthenticated(res.data.valid);
-      } catch (error) {
-        console.error("Error verifying token:", error);
-        setIsAuthenticated(false);
-      } finally {
+    const checkAuth = async () => {
+      const res = await db.post("/api/auth/refresh");
+
+      if (res.status !== 200) {
+        router.push("/login");
       }
     };
 
-    verifyToken();
-  }, []);
-  return isAuthenticated;
+    checkAuth();
+
+    const interval = setInterval(checkAuth, 14 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [router]);
 };
 
 export default useAuth;

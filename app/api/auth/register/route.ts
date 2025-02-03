@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import * as z from "zod";
 import { PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
+import { createAccessToken, createRefreshToken } from "@/lib/jwt";
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
+  const cookieStore = await cookies();
   const registerSchema = z.object({
     username: z.string().min(3, { message: "Nama minimal 3 karakter" }),
     email: z.string().email({ message: "Email tidak valid" }),
@@ -50,13 +53,30 @@ export async function POST(req: Request) {
 
     const hashedPassword = await argon2.hash(password);
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         name: username,
         email: email,
         password: hashedPassword,
         role: "CUSTOMER",
       },
+    });
+
+    const accessToken = await createAccessToken(user);
+    const refreshToken = await createRefreshToken(user);
+
+    cookieStore.set("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 30,
+    });
+
+    cookieStore.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return NextResponse.json(
