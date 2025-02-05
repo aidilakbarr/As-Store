@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import * as z from "zod";
 import { PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
-import { createAccessToken, createRefreshToken } from "@/lib/jwt";
 import { cookies } from "next/headers";
+import sendVerificationEmail from "@/utils/sendEmailVerification";
+import { generateEmailToken } from "@/utils/generateOTP";
 
 const prisma = new PrismaClient();
 
@@ -42,46 +43,54 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log(userIsExist);
+    const token = await generateEmailToken();
+    const hashedPassword = await argon2.hash(password);
+
+    if (userIsExist && !userIsExist.isVerified) {
+      await prisma.user.update({
+        where: { id: userIsExist.id },
+        data: {
+          verificationToken: token,
+          name: username,
+          password: hashedPassword,
+        },
+      });
+      await sendVerificationEmail(email, token);
+      return NextResponse.json(
+        { error: "Verification Email Sending in your gmail" },
+        { status: 200 }
+      );
+    }
 
     if (userIsExist) {
       return NextResponse.json(
-        { message: "Email sudah terdaftar" },
+        { error: "Akun sudah terdaftar, silahkan ke halaman login" },
         { status: 400 }
       );
     }
 
-    const hashedPassword = await argon2.hash(password);
-
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name: username,
         email: email,
+        verificationToken: token,
         password: hashedPassword,
         role: "CUSTOMER",
       },
     });
 
-    const accessToken = await createAccessToken(user);
-    const refreshToken = await createRefreshToken(user);
-
-    cookieStore.set("accessToken", accessToken, {
+    cookieStore.set("email", email, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 60 * 30,
     });
 
-    cookieStore.set("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    await sendVerificationEmail(email, token);
 
     return NextResponse.json(
-      { message: "Akun sukses dibuat" },
-      { status: 200 }
+      { message: "Verification email sending..." },
+      { status: 201 }
     );
   } catch (error) {
     console.log("[REGISTER POST]: ", error);

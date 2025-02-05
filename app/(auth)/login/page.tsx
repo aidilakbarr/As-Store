@@ -43,7 +43,6 @@ export default function LoginPage() {
         errors[err.path[0]] = err.message;
       });
       setError(errors);
-      console.log(error);
     }
     try {
       setLoading(true);
@@ -123,16 +122,40 @@ export default function LoginPage() {
             />
             {error.password && <p className="text-red-600">{error.password}</p>}
           </div>
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="remember"
-              onChange={(e) => setShowPassword(e.target.checked)}
-            />
-            <Label htmlFor="remember">Show Password</Label>
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <Checkbox
+                id="remember"
+                onChange={(e) => setShowPassword(e.target.checked)}
+              />
+              <Label htmlFor="remember" className="ml-2">
+                Show Password
+              </Label>
+            </div>
+            <div>
+              <Link href={"/forgot-password"} className="text-sm text-blue-600">
+                Forgot Password?
+              </Link>
+            </div>
           </div>
           <Button type="submit" disabled={loading}>
             Login
           </Button>
+          <Link href={"/api/auth/google"}>
+            <div className="flex items-center justify-center dark:bg-gray-800">
+              <button className="px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:shadow transition duration-150">
+                <Image
+                  className="w-6 h-6"
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  loading="lazy"
+                  alt="google logo"
+                  width={50}
+                  height={50}
+                />
+                <span>Login with Google</span>
+              </button>
+            </div>
+          </Link>
           <div className="text-center dark:text-slate-200 flex justify-center">
             <p>Dont have an account?</p>
             <Link href="/register" className="text-blue-600">

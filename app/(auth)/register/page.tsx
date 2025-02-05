@@ -26,7 +26,7 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -35,7 +35,6 @@ export default function LoginPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [error, setError] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const router = useRouter();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +72,6 @@ export default function LoginPage() {
         toast.success(response.data.message, {
           duration: 3000,
         });
-        router.push("/");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const { data } = error.response;

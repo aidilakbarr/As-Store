@@ -4,6 +4,8 @@ import { PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
 import { createAccessToken, createRefreshToken } from "@/lib/jwt";
 import { cookies } from "next/headers";
+import sendVerificationEmail from "@/utils/sendEmailVerification";
+import { generateEmailToken } from "@/utils/generateOTP";
 
 const prisma = new PrismaClient();
 
@@ -39,6 +41,16 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json(
         { message: "Email tidak terdaftar" },
+        { status: 400 }
+      );
+    }
+
+    const token = await generateEmailToken();
+
+    if (!user.isVerified) {
+      await sendVerificationEmail(email, token);
+      return NextResponse.json(
+        { message: "Silahkan cek email anda untuk menverifikasi akun anda" },
         { status: 400 }
       );
     }

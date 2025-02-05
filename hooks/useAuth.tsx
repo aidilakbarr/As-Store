@@ -1,6 +1,8 @@
+"use client";
+
 import { useEffect } from "react";
 import db from "@/lib/axiosInstance";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const useAuth = () => {
   const router = useRouter();
