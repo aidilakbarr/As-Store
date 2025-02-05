@@ -36,32 +36,38 @@ export default function LoginPage() {
       showPassword,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errors: any = {};
     if (!result.success) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const errors: any = {};
       result.error.errors.forEach((err) => {
         errors[err.path[0]] = err.message;
       });
+    }
+
+    if (Object.keys(errors).length > 0) {
       setError(errors);
     }
-    try {
-      setLoading(true);
-      setError({});
-      const response = await db.post("api/auth/login", {
-        email,
-        password,
-      });
-      toast.success(response.data.message, {
-        duration: 3000,
-      });
 
-      router.push("/");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      const { data } = error.response;
-      toast.error(data.message || "Terjadi kesalahan pada server.");
-    } finally {
-      setLoading(false);
+    if (result.success) {
+      try {
+        setLoading(true);
+        setError({});
+        const response = await db.post("api/auth/login", {
+          email,
+          password,
+        });
+        toast.success(response.data.message, {
+          duration: 3000,
+        });
+
+        router.push("/");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        const { data } = error.response;
+        toast.error(data.message || "Terjadi kesalahan pada server.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
