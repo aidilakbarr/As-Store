@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const db = axios.create();
+const db = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+});
 
 // db.interceptors.request.use(
 //   (config) => {

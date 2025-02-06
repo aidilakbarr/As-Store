@@ -29,6 +29,7 @@ model User {
   resetPasswordToken String?  
   resetPasswordExpires DateTime? 
   createdAt          DateTime @default(now())
+  products             Product[]
 }
 
 enum Role {
@@ -38,4 +39,24 @@ enum Role {
   COURIER
 }
 
-        
+model Product {
+  id         String     @id @default(uuid())
+  nama       String     
+  harga      Int
+  stok       Int
+  warna      String    
+  deskripsi  String     
+  kategori   Category[]
+  imageUrl   String[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  seller     User      @relation(fields: [sellerId], references: [id])
+  sellerId   String
+}  
+
+enum Category {
+  ELEKTRONIK
+  MAINAN
+  ALAT_SEKOLAH
+  AKSESORIS
+}

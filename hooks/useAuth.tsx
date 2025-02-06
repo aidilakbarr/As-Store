@@ -9,7 +9,7 @@ const useAuth = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const res = await db.post("/api/auth/refresh");
+      const res = await db.post("api/auth/refresh");
 
       if (res.status !== 200) {
         router.push("/login");
