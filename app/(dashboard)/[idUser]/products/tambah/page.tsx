@@ -34,7 +34,7 @@ export const addProductSchema = z.object({
     .min(3, "Warna minimal 3 karakter")
     .max(50, "Nama warna terlalu panjang"),
   kategori: z
-    .array(z.enum(["elektronik", "mainan", "alat sekolah", "aksesoris"]))
+    .array(z.enum(["ELEKTRONIK", "MAINAN", "ALAT_SEKOLAH", "AKSESORIS"]))
     .nonempty("Pilih minimal 1 kategori"),
   deskripsi: z
     .string()
@@ -88,7 +88,7 @@ export default function AddProductForm() {
       });
 
       toast.success(response.data.message);
-      router.push(`${params.idUser}/products`);
+      router.push(`/${params.idUser}/products`);
     } catch (error) {
       console.log("[ERROR_ADD_PRODUCT]: ", error);
       toast.error(error.message || "Ada masalah pada server");
@@ -153,39 +153,39 @@ export default function AddProductForm() {
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="elektronik"
-            value="elektronik"
-            checked={kategori.includes("elektronik")}
+            id="ELEKTRONIK"
+            value="ELEKTRONIK"
+            checked={kategori.includes("ELEKTRONIK")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="elektronik">Elektronik</Label>
+          <Label htmlFor="ELEKTRONIK">Elektronik</Label>
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="mainan"
-            value="mainan"
-            checked={kategori.includes("mainan")}
+            id="MAINAN"
+            value="MAINAN"
+            checked={kategori.includes("MAINAN")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="mainan">Mainan</Label>
+          <Label htmlFor="MAINAN">Mainan</Label>
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="alat sekolah"
-            value="alat sekolah"
-            checked={kategori.includes("alat sekolah")}
+            id="ALAT_SEKOLAH"
+            value="ALAT_SEKOLAH"
+            checked={kategori.includes("ALAT_SEKOLAH")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="alat sekolah">Alat sekolah</Label>
+          <Label htmlFor="ALAT_SEKOLAH">Alat sekolah</Label>
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="aksesoris"
-            value="aksesoris"
-            checked={kategori.includes("aksesoris")}
+            id="AKSESORIS"
+            value="AKSESORIS"
+            checked={kategori.includes("AKSESORIS")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="aksesoris">Aksesoris</Label>
+          <Label htmlFor="AKSESORIS">Aksesoris</Label>
         </div>
         {errors.kategori && (
           <p className="text-red-500">

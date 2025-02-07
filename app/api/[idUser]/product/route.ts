@@ -14,7 +14,7 @@ const productSchema = z.object({
     .min(3, "Warna minimal 3 karakter")
     .max(50, "Nama warna terlalu panjang"),
   kategori: z
-    .array(z.enum(["elektronik", "mainan", "alat sekolah", "aksesoris"]))
+    .array(z.enum(["ELEKTRONIK", "MAINAN", "ALAT_SEKOLAH", "AKSESORIS"]))
     .nonempty("Pilih minimal 1 kategori"),
   deskripsi: z
     .string()
@@ -47,21 +47,12 @@ export async function POST(
       );
     }
 
-    const kategori = parsedData.data.kategori.map(
-      (k: string) =>
-        k.toUpperCase() as
-          | "ELEKTRONIK"
-          | "MAINAN"
-          | "ALAT_SEKOLAH"
-          | "AKSESORIS"
-    );
-
     await prisma.product.create({
       data: {
         nama: parsedData.data.nama,
         harga: parsedData.data.harga,
         deskripsi: parsedData.data.deskripsi,
-        kategori: kategori,
+        kategori: parsedData.data.kategori,
         stok: parsedData.data.stok,
         warna: parsedData.data.warna,
         imageUrl: parsedData.data.imageUrl,

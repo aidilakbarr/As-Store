@@ -15,22 +15,17 @@ export async function GET(
       );
     }
 
-    const user = await prisma.user.findFirst({
+    const response = await prisma.user.findMany({
       where: {
-        id: idUser,
+        role: {
+          notIn: ["ADMIN"],
+        },
       },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error("[POST_ME]: ", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.log("[GET_PRODUCT]: ", error);
+    return NextResponse.json(error, { status: 500 });
   }
 }

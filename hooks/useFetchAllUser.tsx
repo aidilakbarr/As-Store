@@ -4,9 +4,9 @@ import db from "@/lib/axiosInstance";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const useFetchUser = () => {
+const useFetchAllUser = () => {
   const params = useParams();
-  const [user, setUser] = useState(null);
+  const [users, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,10 +15,10 @@ const useFetchUser = () => {
       if (!params.idUser) return; // Pastikan idUser ada
 
       try {
-        const response = await db.get(`api/${params.idUser}/user`);
+        const response = await db.get(`api/${params.idUser}/get-all-user`);
         setUser(response.data);
       } catch (error) {
-        console.error("[useFetchUser]: ", error);
+        console.error("[useFetchAllUser]: ", error);
         setError("Failed to fetch user");
       } finally {
         setLoading(false);
@@ -28,7 +28,7 @@ const useFetchUser = () => {
     fetchUser();
   }, [params]);
 
-  return { user, loading, error };
+  return { users, loading, error };
 };
 
-export default useFetchUser;
+export default useFetchAllUser;

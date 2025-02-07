@@ -3,10 +3,9 @@
 import UploadProductImage from "@/components/ui/uploadProductImage";
 import { Button, Checkbox, Label, Textarea, TextInput } from "flowbite-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import db from "@/lib/axiosInstance";
@@ -17,24 +16,14 @@ export const addProductSchema = z.object({
     .string()
     .min(3, "Nama produk minimal 3 karakter")
     .max(100, "Nama terlalu panjang"),
-  harga: z
-    .string()
-    .min(1, "Harga wajib diisi")
-    .transform((val) => Number(val))
-    .refine((val) => val >= 1000 && val <= 100000000, {
-      message: "Harga harus antara Rp1.000 - Rp100.000.000",
-    }),
-  stok: z
-    .string()
-    .min(1, "Stok wajib diisi")
-    .transform((val) => Number(val))
-    .refine((val) => val >= 1, { message: "Stok minimal 1" }),
+  harga: z.number().min(1, "Harga wajib diisi"),
+  stok: z.number().min(1, "Stok wajib diisi"),
   warna: z
     .string()
     .min(3, "Warna minimal 3 karakter")
     .max(50, "Nama warna terlalu panjang"),
   kategori: z
-    .array(z.enum(["elektronik", "mainan", "alat sekolah", "aksesoris"]))
+    .array(z.enum(["ELEKTRONIK", "MAINAN", "ALAT_SEKOLAH", "AKSESORIS"]))
     .nonempty("Pilih minimal 1 kategori"),
   deskripsi: z
     .string()
@@ -48,6 +37,7 @@ export default function EditProductForm() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const { idUser, idProduct } = useParams();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -61,8 +51,6 @@ export default function EditProductForm() {
     // Fetch data produk berdasarkan idUser dan idProduct
     const fetchProduct = async () => {
       try {
-        console.log("4", idUser);
-        console.log("5", idProduct);
         const response = await db.get(`/api/${idUser}/product/${idProduct}`);
         const product = response.data;
 
@@ -74,8 +62,6 @@ export default function EditProductForm() {
         setValue("deskripsi", product.deskripsi);
         setKategori(product.kategori);
         setImageURLs(product.imageUrl);
-        console.log("5", product);
-        console.log("5", product.imageUrl);
       } catch (error) {
         toast.error("Gagal mengambil data produk");
         console.log("[ERROR_FETCH_PRODUCT]:", error);
@@ -101,10 +87,11 @@ export default function EditProductForm() {
       setErr("Harus upload minimal 1 gambar");
       return;
     }
+
     setErr(null);
     try {
       setLoading(true);
-      const response = await db.put(`/api/${idUser}/product/${idProduct}`, {
+      const response = await db.put(`api/${idUser}/product/${idProduct}`, {
         nama: data.nama,
         harga: data.harga,
         deskripsi: data.deskripsi,
@@ -115,7 +102,7 @@ export default function EditProductForm() {
       });
 
       toast.success(response.data.message);
-      console.log(response);
+      router.push(`/${idUser}/products`);
     } catch (error) {
       console.log("[ERROR_EDIT_PRODUCT]: ", error);
       toast.error(error.message || "Ada masalah pada server");
@@ -180,39 +167,39 @@ export default function EditProductForm() {
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="elektronik"
-            value="elektronik"
-            checked={kategori.includes("elektronik")}
+            id="ELEKTRONIK"
+            value="ELEKTRONIK"
+            checked={kategori.includes("ELEKTRONIK")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="elektronik">Elektronik</Label>
+          <Label htmlFor="ELEKTRONIK">Elektronik</Label>
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="mainan"
-            value="mainan"
-            checked={kategori.includes("mainan")}
+            id="MAINAN"
+            value="MAINAN"
+            checked={kategori.includes("MAINAN")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="mainan">Mainan</Label>
+          <Label htmlFor="MAINAN">Mainan</Label>
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="alat sekolah"
-            value="alat sekolah"
-            checked={kategori.includes("alat sekolah")}
+            id="ALAT_SEKOLAH"
+            value="ALAT_SEKOLAH"
+            checked={kategori.includes("ALAT_SEKOLAH")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="alat sekolah">Alat sekolah</Label>
+          <Label htmlFor="ALAT_SEKOLAH">Alat sekolah</Label>
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="aksesoris"
-            value="aksesoris"
-            checked={kategori.includes("aksesoris")}
+            id="AKSESORIS"
+            value="AKSESORIS"
+            checked={kategori.includes("AKSESORIS")}
             onChange={handleCheckboxChange}
           />
-          <Label htmlFor="aksesoris">Aksesoris</Label>
+          <Label htmlFor="AKSESORIS">Aksesoris</Label>
         </div>
         {errors.kategori && (
           <p className="text-red-500">
