@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(
-      { message: "Akun sukses dibuat" },
+      { message: "Akun sukses dibuat", id: user.id },
       { status: 200 }
     );
   } catch (error) {

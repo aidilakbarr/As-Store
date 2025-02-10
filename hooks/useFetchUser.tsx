@@ -15,7 +15,7 @@ const useFetchUser = () => {
       if (!params.idUser) return; // Pastikan idUser ada
 
       try {
-        const response = await db.get(`api/${params.idUser}/user`);
+        const response = await db.get(`api/${params.idUser}/profile`);
         setUser(response.data);
       } catch (error) {
         console.error("[useFetchUser]: ", error);

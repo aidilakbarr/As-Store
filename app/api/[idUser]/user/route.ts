@@ -1,4 +1,6 @@
+import { verifyAccessToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -15,22 +17,27 @@ export async function GET(
       );
     }
 
-    const user = await prisma.user.findFirst({
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value || "";
+    const decoded = await verifyAccessToken(accessToken);
+    if (!decoded || decoded.id !== idUser || decoded.role !== "SELLER") {
+      return NextResponse.json(
+        { error: "Unauthorized", decoded, idUser },
+        { status: 401 }
+      );
+    }
+
+    const response = await prisma.user.findMany({
       where: {
-        id: idUser,
+        role: {
+          notIn: ["SELLER"],
+        },
       },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error("[POST_ME]: ", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.log("[GET_PRODUCT]: ", error);
+    return NextResponse.json(error, { status: 500 });
   }
 }

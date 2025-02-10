@@ -33,7 +33,7 @@ function VerifyEmailPageContent() {
           setMessage("Verification failed. Please try again.");
         }
 
-        router.push("/");
+        router.push(`/${response.data.id}`);
       } catch (error) {
         console.error(error);
         setMessage("Failed to verify email. Please try again.");

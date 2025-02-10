@@ -1,12 +1,12 @@
 "use client";
 
-import useAuth from "@/hooks/useAuth";
+// import useAuth from "@/hooks/useAuth";
 import db from "@/lib/axiosInstance";
 import { Button } from "flowbite-react";
 import toast from "react-hot-toast";
 
 export default function Home() {
-  useAuth();
+  // useAuth();
 
   const handleLogOut = async () => {
     try {

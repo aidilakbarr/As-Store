@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
     const decoded = await verifyAccessToken(accessToken);
 
     if (!decoded) {
-      throw new Error();
+      throw new Error("Invalid or expired access token.");
     }
 
     return NextResponse.next();
@@ -33,6 +33,7 @@ export async function middleware(req: NextRequest) {
         id: decoded.id as string,
         name: decoded.name as string,
         email: decoded.email as string,
+        role: decoded.role as string,
       };
 
       const newAccessToken = await createAccessToken(user);
@@ -43,6 +44,7 @@ export async function middleware(req: NextRequest) {
         secure: process.env.NODE_ENV === "production",
         path: "/",
         maxAge: 60 * 30,
+        sameSite: "strict",
       });
 
       return response;
@@ -54,5 +56,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/", "/:uuid/:path*"],
 };

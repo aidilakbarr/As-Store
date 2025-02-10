@@ -1,4 +1,6 @@
+import { verifyAccessToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 
@@ -16,16 +18,19 @@ export async function GET(
       );
     }
 
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value || "";
+    const decoded = await verifyAccessToken(accessToken);
+    if (!decoded || decoded.id !== idUser || decoded.role !== "SELLER") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const response = await prisma.product.findFirst({
       where: {
         sellerId: idUser,
         id: idProduct,
       },
     });
-
-    console.log("1", response);
-    console.log("2", idUser);
-    console.log("3", idProduct);
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
@@ -88,6 +93,13 @@ export async function PUT(
           | "AKSESORIS"
     );
 
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value || "";
+    const decoded = await verifyAccessToken(accessToken);
+    if (!decoded || decoded.id !== idUser || decoded.role !== "SELLER") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await prisma.product.update({
       data: {
         nama: parsedData.data.nama,
@@ -127,6 +139,13 @@ export async function DELETE(
         { error: "Missing idUser parameter" },
         { status: 400 }
       );
+    }
+
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value || "";
+    const decoded = await verifyAccessToken(accessToken);
+    if (!decoded || decoded.id !== idUser || decoded.role !== "SELLER") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await prisma.product.delete({

@@ -15,7 +15,7 @@ const useFetchProduct = () => {
       if (!params.idUser) return; // Pastikan idUser ada
 
       try {
-        const response = await db.get(`api/${params.idUser}/get-all-product`);
+        const response = await db.get(`api/${params.idUser}/product`);
         setProduct(response.data);
       } catch (error) {
         console.error("[useFetchProduct]: ", error);

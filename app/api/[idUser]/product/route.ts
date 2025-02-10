@@ -1,4 +1,6 @@
+import { verifyAccessToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 
@@ -47,6 +49,13 @@ export async function POST(
       );
     }
 
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value || "";
+    const decoded = await verifyAccessToken(accessToken);
+    if (!decoded || decoded.id !== idUser || decoded.role !== "SELLER") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await prisma.product.create({
       data: {
         nama: parsedData.data.nama,
@@ -66,6 +75,40 @@ export async function POST(
     );
   } catch (error) {
     console.log("[POST_PRODUCT]: ", error);
+    return NextResponse.json(error, { status: 500 });
+  }
+}
+
+export async function GET(
+  req: Request,
+  { params }: { params: { idUser: string } }
+) {
+  try {
+    const { idUser } = await params;
+
+    if (!idUser) {
+      return NextResponse.json(
+        { error: "Missing idUser parameter" },
+        { status: 400 }
+      );
+    }
+
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value || "";
+    const decoded = await verifyAccessToken(accessToken);
+    if (!decoded || decoded.id !== idUser || decoded.role !== "SELLER") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const response = await prisma.product.findMany({
+      where: {
+        sellerId: idUser,
+      },
+    });
+
+    return NextResponse.json(response, { status: 200 });
+  } catch (error) {
+    console.log("[GET_PRODUCT]: ", error);
     return NextResponse.json(error, { status: 500 });
   }
 }

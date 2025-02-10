@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import DeleteModal from "@/components/modal/deleteModal";
 import SearchPage from "@/components/ui/search";
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 15;
 
 export default function ProductPage() {
   const [search, setSearch] = useState("");

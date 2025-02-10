@@ -15,7 +15,7 @@ const useFetchAllUser = () => {
       if (!params.idUser) return; // Pastikan idUser ada
 
       try {
-        const response = await db.get(`api/${params.idUser}/get-all-user`);
+        const response = await db.get(`api/${params.idUser}/user`);
         setUser(response.data);
       } catch (error) {
         console.error("[useFetchAllUser]: ", error);

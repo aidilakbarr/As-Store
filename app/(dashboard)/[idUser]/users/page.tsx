@@ -1,14 +1,13 @@
 "use client";
 
 import { Button, Pagination, Table } from "flowbite-react";
-import { useParams } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import useFetchAllUser from "@/hooks/useFetchAllUser";
 import DeleteUserModal from "@/components/modal/deleteUserModal";
 import SearchPage from "@/components/ui/search";
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 15;
 
 export default function UserPage() {
   const [search, setSearch] = useState("");

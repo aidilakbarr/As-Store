@@ -9,6 +9,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role: string;
 }
 
 if (!secretKey) {
@@ -24,6 +25,7 @@ const createAccessToken = async (user: User) => {
     id: user.id,
     username: user.name,
     email: user.email,
+    role: user.role,
   };
   return await new jwt.SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -36,6 +38,7 @@ const createRefreshToken = async (user: User) => {
     id: user.id,
     username: user.name,
     email: user.email,
+    role: user.role,
   };
 
   return await new jwt.SignJWT(payload)

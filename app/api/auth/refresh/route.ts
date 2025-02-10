@@ -19,6 +19,7 @@ export async function POST(req: Request) {
       id: decoded.id as string,
       name: decoded.name as string,
       email: decoded.email as string,
+      role: decoded.role as string,
     };
     const newAccessToken = await createAccessToken(user);
 
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 60,
+      maxAge: 60 * 30,
     });
 
     return NextResponse.json({ message: "Token di refresh" }, { status: 200 });

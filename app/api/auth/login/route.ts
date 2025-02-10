@@ -80,7 +80,10 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return NextResponse.json({ message: "Login Berhasil" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Login Berhasil", id: user.id },
+      { status: 200 }
+    );
   } catch (error) {
     console.log("[POST LOGIN: ]", error);
     return NextResponse.json({ error: error }, { status: 500 });

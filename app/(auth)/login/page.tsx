@@ -60,7 +60,7 @@ export default function LoginPage() {
           duration: 3000,
         });
 
-        router.push("/");
+        router.push(`/${response.data.id}`);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const { data } = error.response;
