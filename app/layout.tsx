@@ -1,5 +1,6 @@
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import "@/app/css/satoshi.css";
 import { ThemeModeScript } from "flowbite-react";
 
 export default function RootLayout({
