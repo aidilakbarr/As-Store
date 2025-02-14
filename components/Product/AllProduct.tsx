@@ -1,11 +1,13 @@
 "use client";
 
-import { addToCart } from "@/redux/slices/cartSlice";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { FaStar } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "@/redux/slices/cartSlice";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
 
 const products = [
   {
@@ -64,25 +66,22 @@ const products = [
     rating: 4.3,
     image: "/assets/image/fitbit.jpg",
   },
-  {
-    id: 9,
-    name: "Fitbit Versa",
-    price: "$299",
-    rating: 4.3,
-    image: "/assets/image/fitbit.jpg",
-  },
 ];
 
-export default function ProductSlider() {
+export default function AllProduct() {
   const params = useParams();
   const dispatch = useDispatch();
+
   const addCart = (product: any) => {
     dispatch(addToCart(product));
     toast.success("Produk ditambahkan di cart");
   };
   return (
-    <div className="w-full mx-auto overflow-hidden gap-6">
-      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4">
+    <>
+      <div className="flex justify-between my-6">
+        <h1 className="text-3xl font-semibold text-slate-800">Product Kami</h1>
+      </div>
+      <div className="grid grid-cols-4 gap-6">
         {products.map((product) => (
           <div
             key={product.id}
@@ -101,10 +100,12 @@ export default function ProductSlider() {
               <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {product.name}
               </h5>
-              <div className="mt-2.5 mb-5">
-                <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-sm dark:bg-blue-200 dark:text-blue-800">
-                  {product.rating}
-                </span>
+              <div className="flex gap-1 items-center">
+                {[...Array(4)].map((_, index) => (
+                  <FaStar key={index} color="orange" />
+                ))}
+                <FaStar />
+                <div>(150 Reviews)</div>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -112,7 +113,7 @@ export default function ProductSlider() {
                 </span>
                 <button
                   onClick={() => addCart(product)}
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  className="text-white bg-pink-400 hover:bg-pink-600 focus:ring-4 focus:ring-pink-300 font-medium rounded-md text-sm px-6 py-2.5 me-2 mb-2 dark:bg-pink-600 dark:hover:bg-pink-700 focus:outline-none dark:focus:ring-pink-600"
                 >
                   Add to cart
                 </button>
@@ -121,6 +122,6 @@ export default function ProductSlider() {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }

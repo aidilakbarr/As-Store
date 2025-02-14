@@ -47,7 +47,9 @@ export default function StoreHeader() {
       </nav>
       <div className="flex gap-2">
         <SearchPage search={search} setSearch={setSearch} />
-        <IoCartOutline className="h-10 w-10 cursor-pointer" />
+        <Link href={`/store/${params.idUser}/cart`}>
+          <IoCartOutline className="h-10 w-10 cursor-pointer" />
+        </Link>
       </div>
     </div>
   );

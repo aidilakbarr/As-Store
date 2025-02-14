@@ -14,7 +14,7 @@ const SearchPage: React.FC<searchProps> = ({ search, setSearch }) => {
         icon={HiSearch}
         type="text"
         placeholder="Type to search..."
-        className="w-full bg-transparent pl-9 pr-4 font-medium focus:outline-none"
+        className="w-full bg-transparent pl-9 pr-4 font-medium focus:outline-none "
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />

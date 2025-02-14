@@ -1,7 +1,11 @@
+"use client";
+
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import "@/app/css/satoshi.css";
 import { ThemeModeScript } from "flowbite-react";
+import { Provider } from "react-redux";
+import { store } from "@/redux/store";
 
 export default function RootLayout({
   children,
@@ -15,7 +19,7 @@ export default function RootLayout({
       </head>
       <body>
         <Toaster position="top-center" />
-        {children}
+        <Provider store={store}>{children}</Provider>
       </body>
     </html>
   );

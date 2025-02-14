@@ -1,5 +1,12 @@
+"use client";
+
+import { addToCart } from "@/redux/slices/cartSlice";
 import { Button } from "flowbite-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 
 const products = [
   {
@@ -61,6 +68,12 @@ const products = [
 ];
 
 export default function OurProduct() {
+  const dispatch = useDispatch();
+  const params = useParams();
+  const addCart = (product: any) => {
+    dispatch(addToCart(product));
+    toast.success("Produk ditambahkan di cart");
+  };
   return (
     <>
       <div className="flex justify-between my-6">
@@ -72,13 +85,15 @@ export default function OurProduct() {
             key={product.id}
             className="min-w-[250px] snap-start bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
           >
-            <Image
-              className="rounded-t-lg"
-              src={product.image}
-              alt={product.name}
-              width={500}
-              height={500}
-            />
+            <Link href={`/store/${params.idUser}/${product.id}`}>
+              <Image
+                className="rounded-t-lg"
+                src={product.image}
+                alt={product.name}
+                width={500}
+                height={500}
+              />
+            </Link>
             <div className="px-5 pb-5 flex flex-col justify-between">
               <h5 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {product.name}
@@ -92,12 +107,12 @@ export default function OurProduct() {
                 <span className="text-3xl font-bold text-gray-900 dark:text-white">
                   {product.price}
                 </span>
-                <a
-                  href="#"
+                <button
+                  onClick={() => addCart(product)}
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Add to cart
-                </a>
+                </button>
               </div>
             </div>
           </div>
